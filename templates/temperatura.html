@@ -1,0 +1,202 @@
+<html>
+  <head>
+    <title>Temperature</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+    <link rel="stylesheet" href="../static/css/style.css">
+  </head>
+  <body>
+    <header class="header">
+      <h2>PM3255 - ModbusTCP</h2>
+    </header>
+    <main>
+      <div class="temperatura-contenedor">
+        <h2>Temperatura: <span id="temperature"></span></h2>
+        <h2>Media temperatura: <span id="media-temperature"></span></h2>
+        <div id="alert" style="display: none">
+          La temperatura es demasiado alta 🔥
+        </div>
+      </div>
+      <div class="tablas-contenedor">
+        <div class="temperatura-tabla">
+          <div class="tabla-tiempo-real">
+            <h2>Tiempo real</h2>
+            <table id="temperature-history">
+              <tr>
+                <th>Fecha y hora</th>
+                <th>Temperatura</th>
+              </tr>
+            </table>
+          </div>
+          <div class="tabla-datos-almacenados">
+            <h2>Valores almacenados</h2>
+            <table id="stored-temperature-history">
+              <tr>
+                <th>Fecha y hora</th>
+                <th>Temperatura</th>
+              </tr>
+            </table>
+            <div id="pagination">
+              <button id="prev-page">Anterior</button>
+              <span id="page-number">1</span>
+              <button id="next-page">Siguiente</button>
+            </div>
+          </div>
+        </div>
+        <div class="grafico-contenedor">
+          <canvas id="myChart"></canvas>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      var ctx = document.getElementById("myChart").getContext("2d");
+      var date = new Date();
+      const maxRows = 10;
+      var rows = [];
+
+      var myChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "Temperatura",
+              data: [],
+              backgroundColor: "rgba(255, 99, 132, 0.2)",
+              borderColor: "rgba(255, 99, 132, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          scales: {
+            yAxes: [
+              {
+                ticks: {
+                  beginAtZero: true,
+                },
+              },
+            ],
+          },
+        },
+      });
+
+      function showRows(startIndex, endIndex) {
+        for (var i = 0; i < totalRows; i++) {
+          if (i >= startIndex && i <= endIndex) {
+            rows[i].style.display = "table-row";
+          } else {
+            rows[i].style.display = "none";
+          }
+        }
+      }
+
+      function updateTemperature() {
+        fetch("/temperature")
+          .then((response) => response.json())
+          .then((data) => {
+            document.querySelector("#temperature").innerHTML = data.temperature;
+            myChart.data.labels.push(new Date().toLocaleTimeString());
+            // Agregar datos de temperatura al conjunto de datos del gráfico
+            myChart.data.datasets[0].data.push(data.temperature);
+            // Agregar etiqueta de tiempo al conjunto de etiquetas del gráfico
+            myChart.data.labels.push(new Date().toLocaleTimeString());
+            myChart.update();
+            
+
+            var row = document.createElement("tr");
+            var dateCell = document.createElement("td");
+            dateCell.innerHTML = new Date().toLocaleString();
+            var temperatureCell = document.createElement("td");
+            temperatureCell.innerHTML = data.temperature;
+            row.appendChild(dateCell);
+            row.appendChild(temperatureCell);
+            document.querySelector("#temperature-history").appendChild(row);
+            rows.push(row);
+            if (rows.length > maxRows) {
+              document
+                .querySelector("#temperature-history")
+                .removeChild(rows.shift());
+            }
+            // Almacenar los registros en LocalStorage
+            var temperatureHistory =
+              JSON.parse(localStorage.getItem("temperature-history")) || [];
+            temperatureHistory.push({
+              date: dateCell.innerHTML,
+              temperature: temperatureCell.innerHTML,
+            });
+            localStorage.setItem(
+              "temperature-history",
+              JSON.stringify(temperatureHistory)
+            );
+          });
+      }
+
+      function updateMediaTemperature() {
+        fetch("/temperature_average")
+          .then((response) => response.json())
+          .then((data) => {
+            document.querySelector("#media-temperature").innerHTML =
+              data.average_temperature;
+          });
+      }
+      // Recuperar los registros desde LocalStorage y agregarlos a la tabla
+      var temperatureHistory =
+        JSON.parse(localStorage.getItem("temperature-history")) || [];
+      var currentPage = 1;
+      var rowsPerPage = 10;
+      function displayData() {
+        document.querySelector("#stored-temperature-history").innerHTML = "";
+        var startIndex = (currentPage - 1) * rowsPerPage;
+        var endIndex = startIndex + rowsPerPage;
+        for (
+          var i = startIndex;
+          i < endIndex && i < temperatureHistory.length;
+          i++
+        ) {
+          var history = temperatureHistory[i];
+          var row = document.createElement("tr");
+          var dateCell = document.createElement("td");
+          dateCell.innerHTML = history.date;
+          var temperatureCell = document.createElement("td");
+          temperatureCell.innerHTML = history.temperature;
+          row.appendChild(dateCell);
+          row.appendChild(temperatureCell);
+          document
+            .querySelector("#stored-temperature-history")
+            .appendChild(row);
+        }
+        document.querySelector("#page-number").innerHTML = currentPage;
+      }
+      // Eventos de paginación
+      document
+        .querySelector("#prev-page")
+        .addEventListener("click", function () {
+          if (currentPage > 1) {
+            currentPage--;
+            displayData();
+          }
+        });
+      document
+        .querySelector("#next-page")
+        .addEventListener("click", function () {
+          if (
+            currentPage < Math.ceil(temperatureHistory.length / rowsPerPage)
+          ) {
+            currentPage++;
+            displayData();
+          }
+        });
+
+      setInterval(updateTemperature, 2000); // 2 segundos
+      //setInterval(updateMediaTemperature, (60 - date.getSeconds()) * 1000); // 5 seconds
+      setInterval(
+        updateMediaTemperature,
+        (60 - date.getSeconds() + 300) * 1000
+      ); // 5 minutes
+      updateTemperature();
+      //updateMediaTemperature();
+      displayData();
+    </script>
+  </body>
+</html>

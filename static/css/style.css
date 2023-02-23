@@ -1,0 +1,136 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    background-color: rgb(237, 237, 237);
+}
+.header{
+    background-color: #aafd77;
+    height: 100px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.header h2{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 700;
+    font-size: 40px;
+}
+main{
+    padding: 10px 20px;
+}
+
+.temperatura-contenedor{
+   margin-bottom: 10px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    display: flex;
+    align-items: center;
+}
+.temperatura-contenedor h2{
+    margin-right: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #494949;
+}
+#temperature, #media-temperature{
+    color: rgb(42, 42, 210);
+}
+#alert{
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgb(210, 41, 41);
+    color: #fff;
+    padding: 5px 20px;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+}
+
+/** TABLAS **/
+
+.tablas-contenedor{
+    display: flex;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    width: 100%;
+}
+.temperatura-tabla{
+    display: flex;
+    width: 40%;
+    justify-content: space-around;
+}
+
+#temperature-history {
+    width: 100%;
+  }
+  #temperature-history th, #temperature-history td {
+    border: 1px solid #dddddd;
+    padding: 8px;
+    text-align: left;
+    font-size: 1.2em;
+  }
+  #temperature-history tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  #temperature-history tr:nth-child(odd) {
+    background-color: #ffffff;
+  }
+
+.grafico-contenedor{
+    width: 60%;
+}
+
+#stored-temperature-history{
+    width: 100%;
+}
+#stored-temperature-history th, #stored-temperature-history td {
+    border: 1px solid #dddddd;
+    padding: 8px;
+    text-align: left;
+    font-size: 1.2em;
+  }
+  #stored-temperature-history tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  #stored-temperature-history tr:nth-child(odd) {
+    background-color: #ffffff;
+  }
+
+  #pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+  }
+  #prev-page, #next-page {
+    background-color: #dddddd;
+    border: 1px solid #bbbbbb;
+    padding: 8px 16px;
+    border-radius: 5px;
+    margin: 0 10px;
+    cursor: pointer;
+  }
+  #prev-page:hover, #next-page:hover {
+    background-color: #cccccc;
+  }
+  #page-number {
+    font-size: 1.2em;
+    margin: 0 10px;
+  }
+
+
